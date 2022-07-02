@@ -43,3 +43,5 @@ reward: [多穿拣选的箱数（累计）, 订单触发的补货数（累计）
 done: true: 仿真结束： false: 仿真未结束
 info: restriction!!!: 不满足限制条件强制结束；normal: 仿真正常运行/结束
 '''
+
+# 测试
