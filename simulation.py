@@ -12,7 +12,7 @@ import calendar
 import math
 import csv
 
-NEED_MONTH = 7  # 订单月份
+NEED_MONTH = 8  # 订单月份
 
 
 SKU_DIC_TEMP = {}  # 减少使用次数 SKU编号(int)：[一箱支数(int)，一板箱数(int)，多穿料箱可放箱数(int)]
@@ -170,6 +170,7 @@ class Mainwork:
             # 订单出货
             if sku_id in ms_list:
                 if sku_qty >= 18:
+                    self.total_sell_num -= sku_qty
                     self.pr_sell(sku_id, sku_qty, ms_list, sku_info)
                 else:
                     self.ms.ms_sell(sku_id, sku_qty, sku_info)
