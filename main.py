@@ -18,11 +18,12 @@ env = SimulationEnv()  # 构建仿真环境
 start = time.perf_counter()
 
 # 开始仿真
-for i in range(1000):
+for i in range(1):
     env.reset(first_day_sku_dic)  # 重置仿真环境
     goods_cells_empty_num_min = 10320
     while True:
         observation, reward, done, info = env.step(MS_LIST)  # MS_LIST格式: {SKU编号：[最小值，最大值],}
+        print(observation[0])
         if observation[0] < goods_cells_empty_num_min:
             goods_cells_empty_num_min = observation[0]
         if done:

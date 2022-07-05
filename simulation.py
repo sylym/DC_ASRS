@@ -12,7 +12,7 @@ import calendar
 import math
 import csv
 
-NEED_MONTH = 8  # 订单月份
+NEED_MONTH = 6  # 订单月份
 
 
 SKU_DIC_TEMP = {}  # 减少使用次数 SKU编号(int)：[一箱支数(int)，一板箱数(int)，多穿料箱可放箱数(int)]
@@ -126,11 +126,45 @@ class Mainwork:
         # 计算初始多穿空货格数
         for sku_id in first_day_sku_dic:
             self.ms.goods_cells_empty_num -= math.ceil(self.ms.sku_dic[sku_id] / SKU_DIC_TEMP[sku_id][2])
+        # 前一天的数据
+        self.daytime_pre = 0
+        self.pr_pre = {}
+        self.sku_dic_pre = {}
+        self.goods_cells_empty_num_pre = 0
+        self.restriction_pre = False
+        self.total_sell_num_pre = 0
+        self.sell_supplement_num_pre = 0
+        self.ms_sell_num_pre = 0
 
     # 添加每天的订单
     def add_day_picking(self):
         self.daytime += 1
         self.picking_list_day = PICKING_LIST[self.daytime - 1]
+
+    # 备份前一天的数据
+    def back_up(self):
+        self.daytime_pre = self.daytime
+        self.pr_pre = self.pr.copy()
+        self.sku_dic_pre = self.ms.sku_dic.copy()
+        self.goods_cells_empty_num_pre = self.ms.goods_cells_empty_num
+        self.restriction_pre = self.ms.restriction
+        self.total_sell_num_pre = self.total_sell_num
+        self.sell_supplement_num_pre = self.ms.sell_supplement_num
+        self.ms_sell_num_pre = self.ms.ms_sell_num
+        return self.daytime
+
+    # 恢复到前一天的数据
+    def restore(self):
+        self.daytime = self.daytime_pre
+        self.pr = self.pr_pre.copy()
+        self.ms.pr = self.pr
+        self.ms.sku_dic = self.sku_dic_pre.copy()
+        self.ms.goods_cells_empty_num = self.goods_cells_empty_num_pre
+        self.ms.restriction = self.restriction_pre
+        self.total_sell_num = self.total_sell_num_pre
+        self.ms.sell_supplement_num = self.sell_supplement_num_pre
+        self.ms.ms_sell_num = self.ms_sell_num_pre
+        return self.daytime
 
     # 立库出库
     def pr_sell(self, sku_id, sku_qty, ms_list, sku_info):
@@ -212,3 +246,11 @@ class SimulationEnv:
     def step(self, ms_list):
         obs, reward, done, info = self.work.start_work_step(ms_list)
         return obs, reward, done, info
+
+    def restore(self):
+        daytime = self.work.restore()
+        return daytime
+
+    def backup(self):
+        daytime = self.work.back_up()
+        return daytime
