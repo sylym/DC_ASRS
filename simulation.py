@@ -190,8 +190,8 @@ class Mainwork:
                 self.ms.sku_scattered_dic[sku_id] = []
             # 订单出货
             if sku_id in ms_list:
-                if sku_qty >= 18:
-                    self.total_sell_num -= sku_qty  # 计算总出货箱数不计算大于等于18箱的订单
+                if sku_qty > 18:
+                    self.total_sell_num -= sku_qty  # 计算总出货箱数不计算大于18箱的订单
                     self.pr_sell(sku_id, sku_qty, ms_list, sku_info)
                 else:
                     self.ms.ms_sell(sku_id, sku_qty, sku_info)
