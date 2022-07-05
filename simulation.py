@@ -66,17 +66,31 @@ class Ms:
 
     # 出库更新sku_dic和sell_supplement_num
     def sell_manage(self, sku_id, sku_qty, sku_info):
-        past_used_cells = math.ceil(self.sku_dic[sku_id] / sku_info[2])
-        now_used_cells = math.ceil((self.sku_dic[sku_id] - sku_qty) / sku_info[2])
-        self.goods_cells_empty_num += (past_used_cells - now_used_cells)
+        # 料箱出库优先利用该SKU数量最少的料箱
+        past_scattered_used_cells = len(self.sku_scattered_dic[sku_id])
+        self.sku_scattered_dic[sku_id].sort(reverse=True)
+        for per_sku_scattered_num in range(len(self.sku_scattered_dic[sku_id])-1, 0, -1):
+            if self.sku_scattered_dic[sku_id][per_sku_scattered_num] > sku_qty:
+                self.sku_scattered_dic[sku_id][per_sku_scattered_num] -= sku_qty
+                sku_qty = 0
+                break
+            else:
+                sku_qty -= self.sku_scattered_dic[sku_id][per_sku_scattered_num]
+                del self.sku_scattered_dic[sku_id][per_sku_scattered_num]
+        now_scattered_used_cells = len(self.sku_scattered_dic[sku_id])
+        self.goods_cells_empty_num += (past_scattered_used_cells - now_scattered_used_cells)
+        if sku_qty != 0:
+            surplus_used_cells = math.floor(sku_qty / sku_info[2])
+            self.goods_cells_empty_num += surplus_used_cells
+            self.sku_scattered_dic[sku_id].append(sku_info[2] - (sku_qty - surplus_used_cells * sku_info[2]))
         self.sku_dic[sku_id] -= sku_qty
 
     # 补货更新sku_dic和sell_supplement_num
     def supplement_manage(self, sku_id, supplement_num, sku_info):
-        past_used_cells = math.ceil(self.sku_dic[sku_id] / sku_info[2])
-        now_used_cells = math.ceil((self.sku_dic[sku_id] + supplement_num) / sku_info[2])
-        self.goods_cells_empty_num -= (now_used_cells - past_used_cells)
+        supplement_used_cells = math.ceil(supplement_num / sku_info[2])
+        self.goods_cells_empty_num -= supplement_used_cells
         self.sku_dic[sku_id] += supplement_num
+        self.sku_scattered_dic[sku_id].append(supplement_num % sku_info[2])
 
     # 多穿出库
     def ms_sell(self, sku_id, sku_qty, sku_info):
@@ -160,6 +174,8 @@ class Mainwork:
                 self.ms.sku_dic[sku_id] = 0
             if sku_id not in self.pr:
                 self.pr[sku_id] = 0
+            if sku_id not in self.ms.sku_scattered_dic:
+                self.ms.sku_scattered_dic[sku_id] = []
             # 订单出货
             if sku_id in ms_list:
                 if sku_qty >= 18:
