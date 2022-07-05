@@ -54,6 +54,10 @@ for PER_PICKING in range(len(PICKING_HISTORY)-1, 0, -1):
         PICKING_LIST[SKU_DAY-1].append([SKU_ID, SKU_QTY, SKU_DIC_TEMP[SKU_ID]])
 
 
+def remainder(a, b):
+    return a - math.floor(a / b) * b
+
+
 class Ms:
     def __init__(self, pr):
         self.sku_dic = {}  # SKU编号：多穿内箱数
@@ -83,14 +87,18 @@ class Ms:
         if sku_qty != 0:
             surplus_used_cells = math.floor(sku_qty / sku_info[2])
             self.goods_cells_empty_num += surplus_used_cells
-            self.sku_scattered_dic[sku_id].append(sku_info[2] - sku_qty % sku_info[2])
+            per_sku_scattered_num = remainder(sku_qty, sku_info[2])
+            if per_sku_scattered_num != 0:
+                self.sku_scattered_dic[sku_id].append(sku_info[2] - per_sku_scattered_num)
 
     # 补货更新sku_dic,sell_supplement_num和sku_scattered_dic
     def supplement_manage(self, sku_id, supplement_num, sku_info):
         supplement_used_cells = math.ceil(supplement_num / sku_info[2])
         self.goods_cells_empty_num -= supplement_used_cells
         self.sku_dic[sku_id] += supplement_num
-        self.sku_scattered_dic[sku_id].append(supplement_num % sku_info[2])
+        per_sku_scattered_num = remainder(supplement_num, sku_info[2])
+        if per_sku_scattered_num != 0:
+            self.sku_scattered_dic[sku_id].append(per_sku_scattered_num)
 
     # 多穿出库
     def ms_sell(self, sku_id, sku_qty, sku_info):
@@ -132,7 +140,9 @@ class Mainwork:
         # 计算初始多穿空货格数并填充sku_scattered_dic
         for sku_id in first_day_sku_dic:
             self.ms.goods_cells_empty_num -= math.ceil(self.ms.sku_dic[sku_id] / SKU_DIC_TEMP[sku_id][2])
-            self.ms.sku_scattered_dic[sku_id] = [self.ms.sku_dic[sku_id] % SKU_DIC_TEMP[sku_id][2]]
+            per_sku_scattered_num = remainder(self.ms.sku_dic[sku_id], SKU_DIC_TEMP[sku_id][2])
+            if per_sku_scattered_num != 0:
+                self.ms.sku_scattered_dic[sku_id] = [per_sku_scattered_num]
 
     # 添加每天的订单
     def add_day_picking(self):
@@ -148,7 +158,7 @@ class Mainwork:
         else:
             self.pr[sku_id] -= sku_qty
             return 0
-        sku_qty_surplus = sku_qty % sku_info[1]
+        sku_qty_surplus = remainder(sku_qty, sku_info[1])
         if sku_id in ms_list:
             if ms_list[sku_id][1] < (sku_info[1] - sku_qty_surplus + self.ms.sku_dic[sku_id]):
                 self.pr[sku_id] = sku_info[1] - sku_qty_surplus

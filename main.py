@@ -23,7 +23,7 @@ for i in range(1):
     goods_cells_empty_num_min = 10320
     while True:
         observation, reward, done, info = env.step(MS_LIST)  # MS_LIST格式: {SKU编号：[最小值，最大值],}
-        print(observation[0])
+        #print(observation[0])
         if observation[0] < goods_cells_empty_num_min:
             goods_cells_empty_num_min = observation[0]
         if done:
