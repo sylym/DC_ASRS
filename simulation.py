@@ -64,7 +64,7 @@ class Ms:
         self.pr = pr
         self.restriction = False  # 是否触发限制条件
 
-    # 出库更新sku_dic和sell_supplement_num
+    # 出库更新sku_dic,sell_supplement_num和sku_scattered_dic
     def sell_manage(self, sku_id, sku_qty, sku_info):
         self.sku_dic[sku_id] -= sku_qty
         # 料箱出库优先利用该SKU数量最少的料箱
@@ -85,7 +85,7 @@ class Ms:
             self.goods_cells_empty_num += surplus_used_cells
             self.sku_scattered_dic[sku_id].append(sku_info[2] - sku_qty % sku_info[2])
 
-    # 补货更新sku_dic和sell_supplement_num
+    # 补货更新sku_dic,sell_supplement_num和sku_scattered_dic
     def supplement_manage(self, sku_id, supplement_num, sku_info):
         supplement_used_cells = math.ceil(supplement_num / sku_info[2])
         self.goods_cells_empty_num -= supplement_used_cells
