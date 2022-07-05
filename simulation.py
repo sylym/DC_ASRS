@@ -100,7 +100,7 @@ class Ms:
         if per_sku_scattered_num != 0:
             self.sku_scattered_dic[sku_id].append(per_sku_scattered_num)
 
-    # 多穿出库
+    # sku在多穿列表中的多穿出库
     def ms_sell(self, sku_id, sku_qty, sku_info):
         self.ms_sell_num += sku_qty
         if self.sku_dic[sku_id] >= sku_qty:
@@ -134,6 +134,7 @@ class Mainwork:
         self.daytime = 0
         self.picking_list_day = []
         self.total_sell_num = 0  # 总出货箱数
+        self.cost_num = 0  # 总成本(时间成本+人员成本)
         self.pr = {}  # SKU编号：立库散拣剩余箱
         self.ms = Ms(self.pr)
         self.ms.sku_dic = first_day_sku_dic.copy()  # 自定义初始多穿库存
@@ -163,6 +164,7 @@ class Mainwork:
             if ms_list[sku_id][1] < (sku_info[1] - sku_qty_surplus + self.ms.sku_dic[sku_id]):
                 self.pr[sku_id] = sku_info[1] - sku_qty_surplus
             else:
+                # 立库散拣补货
                 self.ms.supplement_manage(sku_id, sku_info[1] - sku_qty_surplus, sku_info)
                 # 检测是否触发限制条件
                 if self.ms.goods_cells_empty_num < 0:
@@ -194,14 +196,14 @@ class Mainwork:
                 else:
                     self.ms.ms_sell(sku_id, sku_qty, sku_info)
             else:
-                # 尽可能从多穿出货
+                # 先尽可能从多穿出货
                 if self.ms.sku_dic[sku_id] >= sku_qty:
-                    self.ms.sku_dic[sku_id] -= sku_qty
                     self.ms.ms_sell_num += sku_qty
+                    self.ms.sell_manage(sku_id, sku_qty, sku_info)
                 else:
                     sku_qty -= self.ms.sku_dic[sku_id]
                     self.ms.ms_sell_num += self.ms.sku_dic[sku_id]
-                    self.ms.sku_dic[sku_id] = 0
+                    self.ms.sell_manage(sku_id, self.ms.sku_dic[sku_id], sku_info)
                     self.pr_sell(sku_id, sku_qty, ms_list, sku_info)
             # 进行min触发的补货
             if sku_id in ms_list:
