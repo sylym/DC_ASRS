@@ -66,10 +66,11 @@ class Ms:
 
     # 出库更新sku_dic和sell_supplement_num
     def sell_manage(self, sku_id, sku_qty, sku_info):
+        self.sku_dic[sku_id] -= sku_qty
         # 料箱出库优先利用该SKU数量最少的料箱
         past_scattered_used_cells = len(self.sku_scattered_dic[sku_id])
         self.sku_scattered_dic[sku_id].sort(reverse=True)
-        for per_sku_scattered_num in range(len(self.sku_scattered_dic[sku_id])-1, 0, -1):
+        for per_sku_scattered_num in range(len(self.sku_scattered_dic[sku_id])-1, -1, -1):
             if self.sku_scattered_dic[sku_id][per_sku_scattered_num] > sku_qty:
                 self.sku_scattered_dic[sku_id][per_sku_scattered_num] -= sku_qty
                 sku_qty = 0
@@ -83,7 +84,6 @@ class Ms:
             surplus_used_cells = math.floor(sku_qty / sku_info[2])
             self.goods_cells_empty_num += surplus_used_cells
             self.sku_scattered_dic[sku_id].append(sku_info[2] - (sku_qty - surplus_used_cells * sku_info[2]))
-        self.sku_dic[sku_id] -= sku_qty
 
     # 补货更新sku_dic和sell_supplement_num
     def supplement_manage(self, sku_id, supplement_num, sku_info):
@@ -116,9 +116,9 @@ class Ms:
             self.pr[sku_id] = 0
         else:
             supplement_num -= self.pr[sku_id]
-            self.pr[sku_id] = 0
             supplement_num = sku_info[1] * math.ceil(supplement_num / sku_info[1])
-            self.supplement_manage(sku_id, supplement_num, sku_info)
+            self.supplement_manage(sku_id, supplement_num + self.pr[sku_id], sku_info)
+            self.pr[sku_id] = 0
 
 
 class Mainwork:
