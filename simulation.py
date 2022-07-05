@@ -84,8 +84,8 @@ class Ms:
         if self.sku_dic[sku_id] >= sku_qty:
             self.sell_manage(sku_id, sku_qty, sku_info)
         else:
-            self.sell_manage(sku_id, self.sku_dic[sku_id], sku_info)
             surplus_qty = sku_qty - self.sku_dic[sku_id]
+            self.sell_manage(sku_id, self.sku_dic[sku_id], sku_info)
             # 进行订单触发的补货
             self.ms_supplement(sku_id, surplus_qty, sku_info, "sell")
             # 检测是否触发限制条件
