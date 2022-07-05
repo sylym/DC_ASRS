@@ -83,7 +83,7 @@ class Ms:
         if sku_qty != 0:
             surplus_used_cells = math.floor(sku_qty / sku_info[2])
             self.goods_cells_empty_num += surplus_used_cells
-            self.sku_scattered_dic[sku_id].append(sku_info[2] - (sku_qty - surplus_used_cells * sku_info[2]))
+            self.sku_scattered_dic[sku_id].append(sku_info[2] - sku_qty % sku_info[2])
 
     # 补货更新sku_dic和sell_supplement_num
     def supplement_manage(self, sku_id, supplement_num, sku_info):
