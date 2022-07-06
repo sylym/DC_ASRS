@@ -8,17 +8,26 @@
 额外补充多穿料箱出库规则:
 1.料箱出库优先利用该SKU数量最少的料箱
 """
-import calendar
 import math
 import csv
 import copy
+import datetime
 
-NEED_MONTH = 6  # 订单月份
+#  需要调整的参数
+START_EVALUATING_DAYTIME = [8, 11]  # 评测开始日期（当日记入评测结果）（当前为8月11日）
+END_EVALUATING_DAYTIME = [9, 10]  # 评测结束日期（当日记入评测结果）（当前为9月10日）
+
+
+def calculation_interval_days(a, b):
+    a_date = datetime.datetime(2021, int(a[0]), int(a[1]))
+    b_date = datetime.datetime(2021, int(b[0]), int(b[1]))
+    interval = b_date - a_date
+    return int(interval.days) + 1
 
 
 SKU_DIC_TEMP = {}  # 减少使用次数 SKU编号(int)：[一箱支数(int)，一板箱数(int)，多穿料箱可放箱数(int)]
 
-PICKING_LIST = [[] for _ in range(calendar.monthrange(2021, NEED_MONTH)[1])]
+PICKING_LIST = [[] for _ in range(calculation_interval_days([6, 1], END_EVALUATING_DAYTIME))]
 # [[[SKU编号(int), 订单箱数(float), [一箱支数(int)，一板箱数(int)，多穿料箱可放箱数(int)]],..]，[第二天订单]]
 
 # PICKING_LIST和SKU_DIC_TEMP的预处理
@@ -50,8 +59,8 @@ for PER_PICKING in range(len(PICKING_HISTORY)-1, 0, -1):
         SKU_BUOM = SKU_DIC_TEMP[SKU_ID][0]
         SKU_QTY = SKU_QTY / SKU_BUOM
     SKU_MONTH, SKU_DAY = get_date(SKU_DATE)
-    if SKU_MONTH == NEED_MONTH:
-        PICKING_LIST[SKU_DAY-1].append([SKU_ID, SKU_QTY, SKU_DIC_TEMP[SKU_ID]])
+    DAYS = calculation_interval_days([6, 1], [SKU_MONTH, SKU_DAY])
+    PICKING_LIST[DAYS-1].append([SKU_ID, SKU_QTY, SKU_DIC_TEMP[SKU_ID]])
 
 
 def remainder(a, b):
@@ -187,10 +196,16 @@ class Mainwork:
             if per_sku_scattered_num != 0:
                 self.ms.sku_scattered_dic[sku_id] = [per_sku_scattered_num]
 
-    # 添加每天的订单
-    def add_day_picking(self):
+    # 添加每天的订单并判断是否开始评测
+    def day_pretreatment(self):
         self.daytime += 1
         self.picking_list_day = PICKING_LIST[self.daytime - 1]
+        if self.daytime == calculation_interval_days([6, 1], START_EVALUATING_DAYTIME):
+            self.total_sell_num = 0
+            self.ms.sell_supplement_num = 0
+            self.ms.ms_sell_num = 0
+            self.ms.time_cost = 0
+            self.ms.personnel_cost = 0
 
     # 立库出库
     def pr_sell(self, sku_id, sku_qty, ms_list, sku_info):
@@ -217,7 +232,7 @@ class Mainwork:
 
     # 主函数(ms_list格式：SKU编号：[最小值，最大值])
     def start_work_step(self, ms_list):
-        self.add_day_picking()
+        self.day_pretreatment()
         for i in range(len(self.picking_list_day)):
             # 获取一个订单的信息并预处理
             sku_id = self.picking_list_day[i][0]
@@ -266,7 +281,7 @@ class Mainwork:
                   self.ms.personnel_cost]
         if self.ms.restriction:
             return obs, reward, True, "restriction!!!"
-        elif self.daytime == calendar.monthrange(2021, NEED_MONTH)[1]:
+        elif self.daytime == len(PICKING_LIST):
             return obs, reward, True, "normal"
         else:
             return obs, reward, False, "normal"
