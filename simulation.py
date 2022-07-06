@@ -58,6 +58,14 @@ def remainder(a, b):
     return a - math.floor(a / b) * b
 
 
+def time_minmax_standardization(a):
+    return (a - 7.2) / (45 - 7.2)
+
+
+def personnel_minmax_standardization(a):
+    return (a - 1) / (2 - 1)
+
+
 class Ms:
     def __init__(self, pr):
         self.sku_dic = {}  # SKU编号：多穿内箱数
@@ -65,8 +73,40 @@ class Ms:
         self.goods_cells_empty_num = 10320  # 多穿空货格数
         self.sell_supplement_num = 0  # 订单触发的补货数（累计）
         self.ms_sell_num = 0  # 多穿拣选的箱数（累计）
+        self.time_cost = 0  # 时间成本（累计）
+        self.personnel_cost = 0  # 人员成本（累计）
         self.pr = pr
         self.restriction = False  # 是否触发限制条件
+
+    # 更新时间成本和人员成本
+    def cost_manage(self, sku_qty, cost_type):
+        if sku_qty > 18:
+            if cost_type == 'pr':
+                self.time_cost += (sku_qty * time_minmax_standardization(9))
+                self.personnel_cost += (sku_qty * personnel_minmax_standardization(1))
+            if cost_type == 'ms':
+                self.time_cost += (sku_qty * time_minmax_standardization(12))
+                self.personnel_cost += (sku_qty * personnel_minmax_standardization(2))
+        elif 18 >= sku_qty > 8:
+            if cost_type == 'pr':
+                self.time_cost += (sku_qty * time_minmax_standardization(10))
+                self.personnel_cost += (sku_qty * personnel_minmax_standardization(1))
+            elif cost_type == 'ms':
+                self.time_cost += (sku_qty * time_minmax_standardization(9))
+                self.personnel_cost += (sku_qty * personnel_minmax_standardization(2))
+            else:
+                self.time_cost += (sku_qty * time_minmax_standardization(45))
+                self.personnel_cost += (sku_qty * personnel_minmax_standardization(2))
+        else:
+            if cost_type == 'pr':
+                self.time_cost += (sku_qty * time_minmax_standardization(12))
+                self.personnel_cost += (sku_qty * personnel_minmax_standardization(1))
+            elif cost_type == 'ms':
+                self.time_cost += (sku_qty * time_minmax_standardization(7.2))
+                self.personnel_cost += (sku_qty * personnel_minmax_standardization(2))
+            else:
+                self.time_cost += (sku_qty * time_minmax_standardization(36))
+                self.personnel_cost += (sku_qty * personnel_minmax_standardization(2))
 
     # 出库更新sku_dic,sell_supplement_num和sku_scattered_dic
     def sell_manage(self, sku_id, sku_qty, sku_info):
@@ -104,15 +144,18 @@ class Ms:
     def ms_sell(self, sku_id, sku_qty, sku_info):
         self.ms_sell_num += sku_qty
         if self.sku_dic[sku_id] >= sku_qty:
+            self.cost_manage(sku_qty, 'ms')
             self.sell_manage(sku_id, sku_qty, sku_info)
         else:
             surplus_qty = sku_qty - self.sku_dic[sku_id]
+            self.cost_manage(self.sku_dic[sku_id], 'ms')
             self.sell_manage(sku_id, self.sku_dic[sku_id], sku_info)
             # 进行订单触发的补货
             self.ms_supplement(sku_id, surplus_qty, sku_info, "sell")
             # 检测是否触发限制条件
             if self.goods_cells_empty_num < 0:
                 self.restriction = True
+            self.cost_manage(surplus_qty, 'supplement')
             self.sell_manage(sku_id, surplus_qty, sku_info)
 
     # 订单和min触发的多穿补货
@@ -134,7 +177,6 @@ class Mainwork:
         self.daytime = 0
         self.picking_list_day = []
         self.total_sell_num = 0  # 总出货箱数
-        self.cost_num = 0  # 总成本(时间成本+人员成本)
         self.pr = {}  # SKU编号：立库散拣剩余箱
         self.ms = Ms(self.pr)
         self.ms.sku_dic = first_day_sku_dic.copy()  # 自定义初始多穿库存
@@ -192,6 +234,7 @@ class Mainwork:
             if sku_id in ms_list:
                 if sku_qty > 18:
                     self.total_sell_num -= sku_qty  # 计算总出货箱数不计算大于18箱的订单
+                    self.ms.cost_manage(sku_qty, 'pr')
                     self.pr_sell(sku_id, sku_qty, ms_list, sku_info)
                 else:
                     self.ms.ms_sell(sku_id, sku_qty, sku_info)
@@ -199,11 +242,14 @@ class Mainwork:
                 # 先尽可能从多穿出货
                 if self.ms.sku_dic[sku_id] >= sku_qty:
                     self.ms.ms_sell_num += sku_qty
+                    self.ms.cost_manage(sku_qty, 'ms')
                     self.ms.sell_manage(sku_id, sku_qty, sku_info)
                 else:
                     sku_qty -= self.ms.sku_dic[sku_id]
                     self.ms.ms_sell_num += self.ms.sku_dic[sku_id]
+                    self.ms.cost_manage(sku_qty, 'ms')
                     self.ms.sell_manage(sku_id, self.ms.sku_dic[sku_id], sku_info)
+                    self.ms.cost_manage(sku_qty, 'pr')
                     self.pr_sell(sku_id, sku_qty, ms_list, sku_info)
             # 进行min触发的补货
             if sku_id in ms_list:
@@ -216,7 +262,8 @@ class Mainwork:
         # 检测仿真是否结束
         obs = [self.ms.goods_cells_empty_num, self.ms.sku_dic, self.pr, self.picking_list_day,
                self.ms.sku_scattered_dic, self.daytime]
-        reward = [self.ms.ms_sell_num, self.ms.sell_supplement_num, self.total_sell_num]
+        reward = [self.ms.ms_sell_num, self.ms.sell_supplement_num, self.total_sell_num, self.ms.time_cost,
+                  self.ms.personnel_cost]
         if self.ms.restriction:
             return obs, reward, True, "restriction!!!"
         elif self.daytime == calendar.monthrange(2021, NEED_MONTH)[1]:
