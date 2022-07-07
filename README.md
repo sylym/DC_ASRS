@@ -19,7 +19,7 @@
 ## DC_ASRS仿真使用
 ### 1. 准备工作
 
-a) 下载并解压 [DC_ASRS.v2.3](https://github.com/sylym/DC_ASRS/releases/download/DC_ASRS/DC_ASRS.v2.3.rar)
+a) 下载并解压 [DC_ASRS.v2.4](https://github.com/sylym/DC_ASRS/releases/download/DC_ASRS_v2.4/DC_ASRS.v2.4.rar)
 
 b) 根据样例文件 [example](example.py) 调用仿真 [simulation](simulation.py) API
 
