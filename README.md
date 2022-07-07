@@ -24,7 +24,9 @@ a) 下载并解压 [DC_ASRS.v2.3](https://github.com/sylym/DC_ASRS/releases/down
 b) 根据样例文件 [example](example.py) 调用仿真 [simulation](simulation.py) API
 
 
-```sh
+```python
+from simulation import SimulationEnv
+
 first_day_sku_dic = {}  # {SKU编号：多穿内箱数}
 MS_LIST = {}  # {SKU编号：[最小值，最大值]}
 
@@ -42,13 +44,13 @@ while True:
 SimulationEnv为仿真环境类，其中包含仿真环境的初始化、进行每日仿真等方法。
 
 **a) env.reset()**
-```sh
+```python
 env.reset()
 ```
 对仿真类进行初始化。
 
 **b) env.step()**
-```sh
+```python
 obs, reward, done, info = env.step(MS_LIST)
 ```
 
@@ -58,7 +60,7 @@ obs, reward, done, info = env.step(MS_LIST)
 
 - MS_LIST：每日的多穿列表, 数据类型为dict, 键值为SKU编号(int)，值为包含min值和max值的list。
 
-```sh
+```python
 MS_LIST = {82292589: [0, 48], 082292590: [2, 50], 82292591: [3, 18]}
 ```
 
@@ -72,7 +74,7 @@ MS_LIST = {82292589: [0, 48], 082292590: [2, 50], 82292591: [3, 18]}
     - obs[4]：不同SKU在多穿货格内的情况（只记录未装满该SKU的货格），数据类型为dict。键值为SKU编号(int)，值为该SKU在不同多穿货格内的箱数(list)。
     - obs[5]：仿真当天为第几天，数据类型为int。
 
-```sh
+```python
 obs = [7020, {82303465: 0, 82305681: 14.0}, {82303465: 12, 82305681: 0}, [[82303465, 12, [1, 108, 4]], [82305681, 10.0, [12, 24, 2]]], {82315635: [], 82305682: [2.0, 1]}, 1]
 ```
 
@@ -83,7 +85,7 @@ obs = [7020, {82303465: 0, 82305681: 14.0}, {82303465: 12, 82305681: 0}, [[82303
     - reward[3]：累计时间成本，数据类型为float。
     - reward[4]：累计人员成本，数据类型为float。
 
-```sh
+```python
 reward = [123523.08333333374, 1447, 288941.83333333343, 31867.222222249267, 288941.8333333335]
 ```
 - done：仿真是否结束，数据类型为bool。
