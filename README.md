@@ -43,13 +43,13 @@ while True:
 
 SimulationEnv为仿真环境类，其中包含仿真环境的初始化、进行每日仿真等方法。
 
-####a) env.reset()
+#### a) env.reset()
 ```python
 env.reset()
 ```
 对仿真类进行初始化。
 
-####b) env.step()
+#### b) env.step()
 ```python
 obs, reward, done, info = env.step(MS_LIST)
 ```
