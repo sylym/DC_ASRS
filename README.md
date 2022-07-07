@@ -6,6 +6,7 @@
 仿真使用[OpenAI Gym](https://github.com/openai/gym) 风格API
 
  **一些重要更新**:
+- v2.4：[simulation](simulation.py) 添加每日更新多穿列表后触发min补货检测
 - v2.3: 根据需求更新 [sku_info](sku_info_new.csv)
 - v2.2: [simulation](simulation.py) 修正为持续仿真并选取某日到某日进行测评
 - v2.1: [simulation](simulation.py) 修正为大于18箱的订单都从多穿发货,reward添加时间成本和人员成本， 添加仿真使用 [example](example.py)
@@ -50,6 +51,8 @@ env.reset()
 ```sh
 obs, reward, done, info = env.step(MS_LIST)
 ```
+
+传入每日多穿列表并进行一天的仿真
 
 **传入参数：**
 
