@@ -9,7 +9,7 @@ env = SimulationEnv()  # 构建仿真环境
 env.reset(first_day_sku_dic)  # 重置仿真环境
 
 while True:
-    observation, reward, done, info = env.step(MS_LIST)
+    observation, reward, done, info = env.step(MS_LIST)  # 进行每日仿真
     if done:
         break
 
