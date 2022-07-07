@@ -70,7 +70,7 @@ MS_LIST = {82292589: [0, 48], 082292590: [2, 50], 82292591: [3, 18]}
     - obs[0]：多穿空货格数，数据类型为int。
     - obs[1]：不同SKU在多穿内箱数，数据类型为dict。键为SKU编号(int)，值为多穿内箱数(float)。
     - obs[2]：不同SKU在立库散拣后剩余箱数，数据类型为dict。键为SKU编号(int)，值为散拣后剩余箱数(float)。
-    - obs[3]：仿真当天的所有订单，数据类型list，列表中每个元素每个订单行(list)，订单行列表样例：[SKU编号(int), 出货箱数(float), [一箱支数(int)，一板箱数(int)，多穿料箱可放箱数(int)]]。
+    - obs[3]：仿真当天的所有订单，数据类型list，列表中每个元素为每个订单行(list)，订单行list样例：[SKU编号(int), 出货箱数(float), [一箱支数(int)，一板箱数(int)，多穿料箱可放箱数(int)]]。
     - obs[4]：不同SKU在多穿货格内的情况（只记录未装满该SKU的货格），数据类型为dict。键为SKU编号(int)，值为该SKU在不同多穿货格内的箱数(list)。
     - obs[5]：仿真当天为第几天，数据类型为int。
 
@@ -100,9 +100,9 @@ reward = [123523.08333333374, 1447.83333333343, 288941.83333333343, 31867.222222
 START_EVALUATING_DAYTIME = [8, 11] # 8月11日
 END_EVALUATING_DAYTIME = [9, 10] # 9月10日
 ```
-START_EVALUATING_DAYTIME：评测开始日期（当日记入评测结果），数据类型为list，[月份(int), 日期(int)]。
+START_EVALUATING_DAYTIME：评测开始日期（当日记入评测结果），数据类型为list，样例：[月份(int), 日期(int)]。
 
-END_EVALUATING_DAYTIME：评测结束日期（当日记入评测结果），数据类型为list，[月份(int), 日期(int)]。
+END_EVALUATING_DAYTIME：评测结束日期（当日记入评测结果），数据类型为list，样例：[月份(int), 日期(int)]。
 
 ## 加速仿真
 
