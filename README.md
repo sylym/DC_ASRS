@@ -9,7 +9,7 @@
 - v2.4：[simulation](simulation.py) 添加每日更新多穿列表后触发min补货检测
 - v2.3: 根据需求更新 [sku_info](sku_info_new.csv)
 - v2.2: [simulation](simulation.py) 修正为持续仿真并选取某日到某日进行测评
-- v2.1: [simulation](simulation.py) 修正为大于18箱的订单都从多穿发货,reward添加时间成本和人员成本， 添加仿真使用 [example](example.py)
+- v2.1: [simulation](simulation.py) 修正为大于18箱的订单都从多穿发货，reward添加时间成本和人员成本，添加仿真使用 [example](example.py)
 - v2.0: [simulation](simulation.py) 修正多穿补货规则（补货只能补到空料箱中)
 
  
