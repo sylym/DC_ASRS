@@ -1,12 +1,10 @@
 from simulation import SimulationEnv
 
 
-# 初始多穿库存
-first_day_sku_dic = {}  # {SKU编号：多穿内箱数}
 MS_LIST = {}  # {SKU编号：[最小值，最大值]}
 
 env = SimulationEnv()  # 构建仿真环境
-env.reset(first_day_sku_dic)  # 重置仿真环境
+env.reset()  # 重置仿真环境
 
 while True:
     observation, reward, done, info = env.step(MS_LIST)  # 进行每日仿真
