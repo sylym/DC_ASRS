@@ -16,8 +16,8 @@
 
 
 
-### DC_ASRS仿真使用
-#### 1. 准备工作
+## DC_ASRS仿真使用
+### 1. 准备工作
 
 a) 下载并解压 [DC_ASRS.v2.3](https://github.com/sylym/DC_ASRS/releases/download/DC_ASRS/DC_ASRS.v2.3.rar)
 
@@ -39,17 +39,17 @@ while True:
         break
 ```
 
-#### 2. 仿真API文档
+### 2. 仿真API文档
 
 SimulationEnv为仿真环境类，其中包含仿真环境的初始化、进行每日仿真等方法。
 
-**a) env.reset()**
+####a) env.reset()
 ```python
 env.reset()
 ```
 对仿真类进行初始化。
 
-**b) env.step()**
+####b) env.step()
 ```python
 obs, reward, done, info = env.step(MS_LIST)
 ```
@@ -95,7 +95,7 @@ reward = [123523.08333333374, 1447, 288941.83333333343, 31867.222222249267, 2889
     - "normal": 仿真正常运行/结束
 
 
-### 3. 加速仿真
+## 加速仿真
 
 使用 [pypy解释器](https://www.pypy.org/) 代替python解释器
 
