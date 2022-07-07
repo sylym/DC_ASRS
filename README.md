@@ -94,6 +94,15 @@ reward = [123523.08333333374, 1447.83333333343, 288941.83333333343, 31867.222222
     - "restriction!!!": 不满足限制条件强制结束
     - "normal": 仿真正常运行/结束
 
+### 3. 仿真可调参数
+
+```python
+START_EVALUATING_DAYTIME = [8, 11] # 8月11日
+END_EVALUATING_DAYTIME = [9, 10] # 9月10日
+```
+START_EVALUATING_DAYTIME：评测开始日期（当日记入评测结果），数据类型为list，[月份(int), 日期(int)]。
+
+END_EVALUATING_DAYTIME：评测结束日期（当日记入评测结果），数据类型为list，[月份(int), 日期(int)]。
 
 ## 加速仿真
 
