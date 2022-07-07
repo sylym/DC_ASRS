@@ -292,7 +292,9 @@ class SimulationEnv:
     def __init__(self):
         self.work = Mainwork({})
 
-    def reset(self, first_day_sku_dic):
+    def reset(self, first_day_sku_dic=None):
+        if first_day_sku_dic is None:
+            first_day_sku_dic = {}
         self.work = Mainwork(first_day_sku_dic)
 
     def step(self, ms_list):

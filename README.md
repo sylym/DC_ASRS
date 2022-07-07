@@ -8,7 +8,7 @@
  **一些重要更新**:
 - v2.3: 根据需求更新 [sku_info](sku_info_new.csv)
 - v2.2: [simulation](simulation.py) 修正为持续仿真并选取某日到某日进行测评
-- v2.1: [simulation](simulation.py) 修正为大于18箱的订单都从多穿发货,reward添加时间成本和人员成本， 添加仿真使用[example](example.py)
+- v2.1: [simulation](simulation.py) 修正为大于18箱的订单都从多穿发货,reward添加时间成本和人员成本， 添加仿真使用 [example](example.py)
 - v2.0: [simulation](simulation.py) 修正多穿补货规则（补货只能补到空料箱中)
 
  
@@ -42,13 +42,23 @@ SimulationEnv为仿真环境类，其中包含仿真环境的初始化、进行�
 
 a) **env.reset()**
 ```sh
-env.reset(MS_LIST_PER_DAY)
+env.reset()
 ```
-&nbsp; &nbsp; &nbsp; &nbsp;对仿真类进行初始化。
+对仿真类进行初始化。
 
-&nbsp; &nbsp; &nbsp; &nbsp;参数：
+b) **env.step()**
+```sh
+obs, reward, done, info = env.step(MS_LIST)
+```
 
-&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;MS_LIST_PER_DAY：初始多穿(MS)的状态, 数据类型为字典(Dictionary), 键值(key)为初始多穿
+参数：
+
+MS_LIST：每日的多穿列表, 数据类型为字典, 键值为SKU编号(int)，值为包含min值和max值的列表。
+
+```sh
+MS_LIST = {82292589: [0, 48], 082292590: [2, 50], 82292591: [3, 18]}
+```
+
 
 ### 3. 加速仿真
 
