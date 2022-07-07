@@ -197,7 +197,7 @@ class Mainwork:
                 self.ms.sku_scattered_dic[sku_id] = [per_sku_scattered_num]
 
     # 添加每天的订单并判断是否开始评测
-    def day_pretreatment(self):
+    def day_pretreatment(self, ms_list):
         self.daytime += 1
         self.picking_list_day = PICKING_LIST[self.daytime - 1]
         if self.daytime == calculation_interval_days([6, 1], START_EVALUATING_DAYTIME):
@@ -206,6 +206,11 @@ class Mainwork:
             self.ms.ms_sell_num = 0
             self.ms.time_cost = 0
             self.ms.personnel_cost = 0
+        for sku_id in self.ms.sku_dic:
+            if sku_id in ms_list:
+                if self.ms.sku_dic[sku_id] < ms_list[sku_id][0]:
+                    sku_info = SKU_DIC_TEMP[sku_id]
+                    self.ms.ms_supplement(sku_id, ms_list[sku_id][0] - self.ms.sku_dic[sku_id], sku_info, "min")
 
     # 立库出库
     def pr_sell(self, sku_id, sku_qty, ms_list, sku_info):
@@ -232,7 +237,7 @@ class Mainwork:
 
     # 主函数(ms_list格式：SKU编号：[最小值，最大值])
     def start_work_step(self, ms_list):
-        self.day_pretreatment()
+        self.day_pretreatment(ms_list)
         for i in range(len(self.picking_list_day)):
             # 获取一个订单的信息并预处理
             sku_id = self.picking_list_day[i][0]
