@@ -1,7 +1,7 @@
 # DC_ASRS
 
 
-本仓库为清华暑期挑战项目0620保洁公司(DC)自动货架系统(ASRS)的python仿真。
+本仓库为清华暑期挑战项目0620保洁DC自动货架系统(ASRS)的python仿真。
 
 仿真使用[OpenAI Gym](https://github.com/openai/gym) 风格API
 
