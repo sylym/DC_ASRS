@@ -204,14 +204,14 @@ class Mainwork:
             self.ms.personnel_cost = 0
         # 改变多穿列表后进行min补货判定
         for sku_id in self.ms.sku_dic:
-            if sku_id not in self.ms.sku_dic:
-                self.ms.sku_dic[sku_id] = 0
-            if sku_id not in self.pr:
-                self.pr[sku_id] = 0
-            if sku_id not in self.ms.sku_scattered_dic:
-                self.ms.sku_scattered_dic[sku_id] = []
             if sku_id in ms_list:
                 if self.ms.sku_dic[sku_id] < ms_list[sku_id][0]:
+                    if sku_id not in self.ms.sku_dic:
+                        self.ms.sku_dic[sku_id] = 0
+                    if sku_id not in self.pr:
+                        self.pr[sku_id] = 0
+                    if sku_id not in self.ms.sku_scattered_dic:
+                        self.ms.sku_scattered_dic[sku_id] = []
                     sku_info = SKU_DIC_TEMP[sku_id]
                     self.ms.ms_supplement(sku_id, ms_list[sku_id][0] - self.ms.sku_dic[sku_id], sku_info, "min")
 
