@@ -113,7 +113,7 @@ END_EVALUATING_DAYTIME：评测结束日期（当日记入评测结果），数�
 
 a) 使用 [pypy解释器](https://www.pypy.org/) 代替python解释器，使用方法参考 [官方文档](https://doc.pypy.org/en/latest/)
 
-b) 直接返回obs
+b) 改变 [仿真](simulation.py)，使其直接返回obs
 
 ```python
 def step(self, ms_list):
