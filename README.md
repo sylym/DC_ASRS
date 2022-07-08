@@ -111,9 +111,19 @@ END_EVALUATING_DAYTIME：评测结束日期（当日记入评测结果），数�
 
 ## 加速仿真
 
-使用 [pypy解释器](https://www.pypy.org/) 代替python解释器
+a) 使用 [pypy解释器](https://www.pypy.org/) 代替python解释器，使用方法参考 [官方文档](https://doc.pypy.org/en/latest/)
 
-使用方法参考 [官方文档](https://doc.pypy.org/en/latest/)
+b) 直接返回obs
+
+```python
+def step(self, ms_list):
+    obs, reward, done, info = self.work.start_work_step(ms_list)
+    # 返回obs的深拷贝会大幅度降低仿真性能, 如需要更快仿真速度, 可以改为直接返回obs, 但是不规范的使用可能obs可能导致出现仿真异常
+    return copy.deepcopy(obs), reward, done, info
+```
+将 copy.deepcopy(obs) 改为 obs
+
+注意：若直接返回obs时，在调用obs时要注意 [python的list拷贝性质](https://blog.csdn.net/qq_24502469/article/details/104185122)
 
 ## 鸣谢
 我们的代码参考如下仓库:
