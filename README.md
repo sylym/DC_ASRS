@@ -6,11 +6,12 @@
 仿真使用[OpenAI Gym](https://github.com/openai/gym) 风格API
 
  **一些重要更新**:
+- v2.5: [simulation](simulation.py) 更新obs[4]为SKU在多穿每个货格中的箱数
 - v2.4：[simulation](simulation.py) 添加每日更新多穿列表后触发min补货检测
 - v2.3: 根据需求更新 [sku_info](sku_info_new.csv)
 - v2.2: [simulation](simulation.py) 修正为持续仿真并选取某日到某日进行测评
 - v2.1: [simulation](simulation.py) 修正为大于18箱的订单都从多穿发货，reward添加时间成本和人员成本，添加仿真使用 [example](example.py)
-- v2.0: [simulation](simulation.py) 修正多穿补货规则（补货只能补到空料箱中)
+
 
  
 
@@ -21,7 +22,7 @@
 
 a) 下载并解压 [DC_ASRS.v2.4](https://github.com/sylym/DC_ASRS/releases/download/DC_ASRS_v2.4/DC_ASRS.v2.4.rar)
 
-b) 在下载最新版本的 [simulation](simulation.py) 并替换DC_ASRS v2.4文件夹下的simulation.py
+b) 下载最新版本的 [simulation](simulation.py) 并替换DC_ASRS v2.4文件夹下的simulation.py
 
 c) 根据样例文件 [example](example.py) 调用仿真 [simulation](simulation.py) API
 
