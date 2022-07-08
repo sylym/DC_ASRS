@@ -118,7 +118,7 @@ class Ms:
                 self.personnel_cost += (sku_qty * personnel_minmax_standardization(2))
 
     # 出库更新sku_dic,sell_supplement_num和sku_scattered_dic
-    def sell_manage(self, sku_id, sku_qty, sku_info):
+    def sell_manage(self, sku_id, sku_qty):
         self.sku_dic[sku_id] -= sku_qty
         # 料箱出库优先利用该SKU数量最少的料箱
         past_scattered_used_cells = len(self.sku_scattered_dic[sku_id])
@@ -126,19 +126,12 @@ class Ms:
         for per_sku_scattered_num in range(len(self.sku_scattered_dic[sku_id])-1, -1, -1):
             if self.sku_scattered_dic[sku_id][per_sku_scattered_num] > sku_qty:
                 self.sku_scattered_dic[sku_id][per_sku_scattered_num] -= sku_qty
-                sku_qty = 0
                 break
             else:
                 sku_qty -= self.sku_scattered_dic[sku_id][per_sku_scattered_num]
                 del self.sku_scattered_dic[sku_id][per_sku_scattered_num]
         now_scattered_used_cells = len(self.sku_scattered_dic[sku_id])
         self.goods_cells_empty_num += (past_scattered_used_cells - now_scattered_used_cells)
-        if sku_qty != 0:
-            surplus_used_cells = math.floor(sku_qty / sku_info[2])
-            self.goods_cells_empty_num += surplus_used_cells
-            per_sku_scattered_num = remainder(sku_qty, sku_info[2])
-            if per_sku_scattered_num != 0:
-                self.sku_scattered_dic[sku_id].append(sku_info[2] - per_sku_scattered_num)
 
     # 补货更新sku_dic,sell_supplement_num和sku_scattered_dic
     def supplement_manage(self, sku_id, supplement_num, sku_info):
@@ -148,24 +141,25 @@ class Ms:
         per_sku_scattered_num = remainder(supplement_num, sku_info[2])
         if per_sku_scattered_num != 0:
             self.sku_scattered_dic[sku_id].append(per_sku_scattered_num)
+        self.sku_scattered_dic[sku_id].extend([sku_info[2]] * math.floor(supplement_num / sku_info[2]))
 
     # sku在多穿列表中的多穿出库
     def ms_sell(self, sku_id, sku_qty, sku_info):
         self.ms_sell_num += sku_qty
         if self.sku_dic[sku_id] >= sku_qty:
             self.cost_manage(sku_qty, 'ms')
-            self.sell_manage(sku_id, sku_qty, sku_info)
+            self.sell_manage(sku_id, sku_qty)
         else:
             surplus_qty = sku_qty - self.sku_dic[sku_id]
             self.cost_manage(self.sku_dic[sku_id], 'ms')
-            self.sell_manage(sku_id, self.sku_dic[sku_id], sku_info)
+            self.sell_manage(sku_id, self.sku_dic[sku_id])
             # 进行订单触发的补货
             self.ms_supplement(sku_id, surplus_qty, sku_info, "sell")
             # 检测是否触发限制条件
             if self.goods_cells_empty_num < 0:
                 self.restriction = True
             self.cost_manage(surplus_qty, 'supplement')
-            self.sell_manage(sku_id, surplus_qty, sku_info)
+            self.sell_manage(sku_id, surplus_qty)
 
     # 订单和min触发的多穿补货
     def ms_supplement(self, sku_id, supplement_num, sku_info, supplement_type):
@@ -195,6 +189,8 @@ class Mainwork:
             per_sku_scattered_num = remainder(self.ms.sku_dic[sku_id], SKU_DIC_TEMP[sku_id][2])
             if per_sku_scattered_num != 0:
                 self.ms.sku_scattered_dic[sku_id] = [per_sku_scattered_num]
+            self.ms.sku_scattered_dic[sku_id].extend(
+                [SKU_DIC_TEMP[sku_id][2]] * math.floor(self.ms.sku_dic[sku_id] / SKU_DIC_TEMP[sku_id][2]))
 
     # 添加每天的订单并判断是否开始评测
     def day_pretreatment(self, ms_list):
@@ -206,6 +202,7 @@ class Mainwork:
             self.ms.ms_sell_num = 0
             self.ms.time_cost = 0
             self.ms.personnel_cost = 0
+        # 改变多穿列表后进行min补货判定
         for sku_id in self.ms.sku_dic:
             if sku_id in ms_list:
                 if self.ms.sku_dic[sku_id] < ms_list[sku_id][0]:
@@ -263,12 +260,12 @@ class Mainwork:
                 if self.ms.sku_dic[sku_id] >= sku_qty:
                     self.ms.ms_sell_num += sku_qty
                     self.ms.cost_manage(sku_qty, 'ms')
-                    self.ms.sell_manage(sku_id, sku_qty, sku_info)
+                    self.ms.sell_manage(sku_id, sku_qty)
                 else:
                     sku_qty -= self.ms.sku_dic[sku_id]
                     self.ms.ms_sell_num += self.ms.sku_dic[sku_id]
                     self.ms.cost_manage(sku_qty, 'ms')
-                    self.ms.sell_manage(sku_id, self.ms.sku_dic[sku_id], sku_info)
+                    self.ms.sell_manage(sku_id, self.ms.sku_dic[sku_id])
                     self.ms.cost_manage(sku_qty, 'pr')
                     self.pr_sell(sku_id, sku_qty, ms_list, sku_info)
             # 进行min触发的补货
@@ -279,6 +276,13 @@ class Mainwork:
             if self.ms.goods_cells_empty_num < 0 or self.ms.restriction:
                 self.ms.restriction = True
                 break
+            # 结束处理
+            if self.ms.sku_dic[sku_id] == 0:
+                del self.ms.sku_dic[sku_id]
+            if self.pr[sku_id] == 0:
+                del self.pr[sku_id]
+            if not self.ms.sku_scattered_dic[sku_id]:
+                del self.ms.sku_scattered_dic[sku_id]
         # 检测仿真是否结束
         obs = [self.ms.goods_cells_empty_num, self.ms.sku_dic, self.pr, self.picking_list_day,
                self.ms.sku_scattered_dic, self.daytime]
