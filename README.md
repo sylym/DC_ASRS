@@ -21,7 +21,9 @@
 
 a) 下载并解压 [DC_ASRS.v2.4](https://github.com/sylym/DC_ASRS/releases/download/DC_ASRS_v2.4/DC_ASRS.v2.4.rar)
 
-b) 根据样例文件 [example](example.py) 调用仿真 [simulation](simulation.py) API
+b) 在下载最新版本的 [simulation](simulation.py) 并替换DC_ASRS v2.4文件夹下的simulation.py
+
+c) 根据样例文件 [example](example.py) 调用仿真 [simulation](simulation.py) API
 
 
 ```python
