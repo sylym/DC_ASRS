@@ -213,7 +213,6 @@ class Mainwork:
                     if self.pr[sku_id] == 0:
                         del self.pr[sku_id]
 
-
     # 立库出库
     def pr_sell(self, sku_id, sku_qty, ms_list, sku_info):
         # 立库散拣优先利用散拣剩余箱
