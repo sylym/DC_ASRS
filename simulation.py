@@ -206,6 +206,8 @@ class Mainwork:
         for sku_id in ms_list:
             if sku_id not in self.ms.sku_dic:
                 self.ms.sku_dic[sku_id] = 0
+            if sku_id not in self.ms.sku_scattered_dic:
+                self.ms.sku_scattered_dic[sku_id] = []
             if self.ms.sku_dic[sku_id] < ms_list[sku_id][0]:
                 if sku_id not in self.pr:
                     self.pr[sku_id] = 0
@@ -213,6 +215,10 @@ class Mainwork:
                 self.ms.ms_supplement(sku_id, ms_list[sku_id][0] - self.ms.sku_dic[sku_id], sku_info, "min")
                 if self.pr[sku_id] == 0:
                     del self.pr[sku_id]
+            if self.ms.sku_dic[sku_id] == 0:
+                del self.ms.sku_dic[sku_id]
+            if not self.ms.sku_scattered_dic[sku_id]:
+                del self.ms.sku_scattered_dic[sku_id]
 
     # 立库出库
     def pr_sell(self, sku_id, sku_qty, ms_list, sku_info):
