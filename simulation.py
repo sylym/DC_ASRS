@@ -260,6 +260,8 @@ class Mainwork:
                 else:
                     self.ms.ms_sell(sku_id, sku_qty, sku_info)
             else:
+                if sku_qty > 18:
+                    self.total_sell_num -= sku_qty  # 计算总出货箱数不计算大于18箱的订单
                 # 先尽可能从多穿出货
                 if self.ms.sku_dic[sku_id] >= sku_qty:
                     self.ms.ms_sell_num += sku_qty
