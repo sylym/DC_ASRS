@@ -6,6 +6,7 @@
 仿真使用[OpenAI Gym](https://github.com/openai/gym) 风格API
 
  **一些重要更新**:
+- v2.6: [simulation](simulation.py) bug修复
 - v2.5: [simulation](simulation.py) 更新obs[4]为SKU在多穿每个货格中的箱数
 - v2.4：[simulation](simulation.py) 添加每日更新多穿列表后触发min补货检测
 - v2.3: 根据需求更新 [sku_info](sku_info_new.csv)
