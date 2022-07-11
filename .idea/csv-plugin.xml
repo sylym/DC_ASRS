@@ -10,6 +10,13 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="\picking_history_test_set.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="\sku_info_new.csv">
           <value>
             <Attribute>
