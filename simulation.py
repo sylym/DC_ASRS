@@ -60,6 +60,8 @@ for PER_PICKING in range(len(PICKING_HISTORY)-1, 0, -1):
         SKU_QTY = SKU_QTY / SKU_BUOM
     SKU_MONTH, SKU_DAY = get_date(SKU_DATE)
     DAYS = calculation_interval_days([6, 1], [SKU_MONTH, SKU_DAY])
+    if DAYS > len(PICKING_LIST):
+        break
     PICKING_LIST[DAYS-1].append([SKU_ID, SKU_QTY, SKU_DIC_TEMP[SKU_ID]])
 
 
