@@ -279,7 +279,7 @@ class Mainwork:
                 else:
                     sku_qty -= self.ms.sku_dic[sku_id]
                     self.ms.ms_sell_num += self.ms.sku_dic[sku_id]
-                    self.ms.cost_manage(sku_qty, 'ms')
+                    self.ms.cost_manage(self.ms.sku_dic[sku_id], 'ms')
                     self.ms.sell_manage(sku_id, self.ms.sku_dic[sku_id])
                     self.ms.cost_manage(sku_qty, 'pr')
                     self.pr_sell(sku_id, sku_qty, ms_list, sku_info)
